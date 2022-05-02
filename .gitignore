@@ -166,3 +166,10 @@ cython_debug/
 
 #logs
 /logs
+
+#pycharm
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
+/.idea/wikipedia-network-analysis.iml
