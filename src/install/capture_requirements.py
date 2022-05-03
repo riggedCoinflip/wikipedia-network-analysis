@@ -1,5 +1,5 @@
 import subprocess
-from definitions import ROOT_DIR
+from src import ROOT_DIR
 
 
 def capture():

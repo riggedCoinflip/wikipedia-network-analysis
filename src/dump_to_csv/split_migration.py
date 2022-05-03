@@ -6,7 +6,7 @@ from typing import Union
 
 from dotenv import load_dotenv
 
-from definitions import LOG_PATH
+from src.constants.definitions import LOG_PATH
 
 load_dotenv()
 

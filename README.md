@@ -29,4 +29,4 @@ $ docker-compose up
 
 ## License
 
-This project is [MIT licensed](LICENSE).
+This project is [MIT licensed]( LICENSE ).
