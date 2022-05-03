@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 02.05.2022
 ### Added
 - scripts to capture and install requirements
+- docker compose of neo4j
 
 ## 01.05.2022
 ### Added
