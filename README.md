@@ -8,10 +8,11 @@ Networkanalysis of wikipedia
 
 ## Installation
 
-1.Download from https://dumps.wikimedia.org/enwiki/<date> the DB dumps named 
-enwiki-<date>-page.sql.gz and enwiki-<date>-pagelinks.sql.gz
-2.Unzip them. Care: about 100 GB of data.
-3.Run `python src/split-migrations.py`
+1. run `python src/install-requirements.py`to install requirements
+2. Download from https://dumps.wikimedia.org/enwiki/<date> the DB dumps named 
+`enwiki-<date>-page.sql.gz` and `enwiki-<date>-pagelinks.sql.gz`
+3. Unzip them. Care: about 100 GB of data.
+4. Run `python src/split-migrations.py`
 
 ## Running the app
 
