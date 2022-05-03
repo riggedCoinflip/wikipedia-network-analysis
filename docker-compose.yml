@@ -1,0 +1,9 @@
+version: '3.3'
+services:
+    neo4j:
+        ports:
+            - '7474:7474'
+            - '7687:7687'
+        volumes:
+            - '/${NEO4J_DIR}:/data'
+        image: neo4j
