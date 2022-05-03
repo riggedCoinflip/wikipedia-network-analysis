@@ -8,7 +8,7 @@ Networkanalysis of wikipedia
 
 ## Installation
 
-1. run `python src/install-requirements.py`to install requirements
+1. `pip install -r requirements.txt`
 2. Download from https://dumps.wikimedia.org/enwiki/<date> the DB dumps named 
 `enwiki-<date>-page.sql.gz` and `enwiki-<date>-pagelinks.sql.gz`
 3. Unzip them. Care: about 100 GB of data.
@@ -26,6 +26,10 @@ $ docker-compose up
 
 ```bash
 ```
+
+## Do on new commit
+- `pip freeze > requirements.txt`
+- update changelog
 
 ## License
 
