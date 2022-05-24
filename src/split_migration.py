@@ -54,15 +54,18 @@ def split_migration(infile, tabname, outpath, skip=0, limit: Union[int, bool] = 
 
             if line.startswith("INSERT INTO"):
                 new_filename = f"{outpath}/{tabname}/{line_num:07}-data.csv"
+
                 with open(new_filename,
                           "w") as target:
-                    rows = line.partition("VALUES")[2][2:-3].split("),(")
-                    '''
-                    partition[2] looks like this:
-                          " (a1, b1),(a2,b2),(...),(a1000,b1000);\n",
-     
-                    cutting the first 2 [" (",");\n"] and last 3 chars and then splitting transforms this into a csv
-                    '''
+                    #  swap " and ' to have " as QUOTECHAR for csv
+                    translation = line.maketrans("'\"", "\"'")
+                    translated = line.translate(translation)
+
+                    # partition[2] looks like this:
+                    #      " (a1, b1),(a2,b2),(...),(a1000,b1000);\n",
+                    # cutting the first 2 [" (",");\n"] and last 3 chars and then splitting transforms this into a csv
+                    rows = translated.partition("VALUES")[2][2:-3].split("),(")
+
                     for row in rows:
                         target.write(f"{row}\n")
                     logging.info(f"created {new_filename}")
@@ -73,11 +76,12 @@ def split_migration(infile, tabname, outpath, skip=0, limit: Union[int, bool] = 
 
 
 def main():
+    print("started. This might take over an hour now")
     t1 = datetime.now()
     split_migration(PAGE_INFILE, PAGE_TABNAME, OUTPATH)
     t2 = datetime.now()
     print(f"page took {(t2 - t1).total_seconds()}")  # page took 135sec
-    split_migration(PAGELINKS_INFILE, PAGELINKS_TABNAME, OUTPATH)
+    # split_migration(PAGELINKS_INFILE, PAGELINKS_TABNAME, OUTPATH)
     t3 = datetime.now()
     print(f"pagelink took {(t3 - t2).total_seconds()}")
     print(f"total took {(t3 - t1).total_seconds()}")

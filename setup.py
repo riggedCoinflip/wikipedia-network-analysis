@@ -8,8 +8,8 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='sample',
-    version='0.1.0',
+    name='wikipedia network analysis',
+    version='0.2.0',
     description='Network analysis of wikipedia',
     long_description=readme,
     author='riggedCoinflip',
