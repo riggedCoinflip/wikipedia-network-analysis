@@ -9,12 +9,12 @@ Networkanalysis of wikipedia
 ## Installation
 
 1. `pip install -r requirements.txt`
-2. Download from https://dumps.wikimedia.org/enwiki/<date> the DB dumps named 
+2. Install docker images
+3. Download from https://dumps.wikimedia.org/enwiki/<date> the DB dumps named 
 `enwiki-<date>-page.sql.gz` and `enwiki-<date>-pagelinks.sql.gz`
-3. Unzip them. Care: about 100 GB of data.
-4. Run `python src/split-migrations.py`. Might take hour or longer - and needs 100 GB as well
-5. After installing the docker images, copy migrations into docker neo4j_test imports folder
-6. Move real world data from step 4 into docker neo4j imports folder
+4. Unzip them. Care: about 100 GB of data.
+5. Run `python src/split-migrations.py`. Might take hour or longer - and needs 100 GB as well
+6. After installing the docker images, copy migrations into docker neo4j_test imports folder
 
 ## Running the app
 

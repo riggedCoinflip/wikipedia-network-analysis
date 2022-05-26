@@ -20,7 +20,7 @@ logging.basicConfig(filename=f"{LOG_PATH}/{SPILT_MIGRATION}",
 
 PAGE_TABNAME = "page"
 PAGELINKS_TABNAME = "pagelinks"
-OUTPATH = os.getenv("OUTPATH")
+OUTPATH = f"{os.getenv('NEO4J_DIR')}/import"
 PAGE_INFILE = os.getenv("PAGE_INFILE")
 PAGELINKS_INFILE = os.getenv("PAGELINKS_INFILE")
 
@@ -81,7 +81,7 @@ def main():
     split_migration(PAGE_INFILE, PAGE_TABNAME, OUTPATH)
     t2 = datetime.now()
     print(f"page took {(t2 - t1).total_seconds()}")  # page took 135sec
-    # split_migration(PAGELINKS_INFILE, PAGELINKS_TABNAME, OUTPATH)
+    split_migration(PAGELINKS_INFILE, PAGELINKS_TABNAME, OUTPATH)
     t3 = datetime.now()
     print(f"pagelink took {(t3 - t2).total_seconds()}")
     print(f"total took {(t3 - t1).total_seconds()}")

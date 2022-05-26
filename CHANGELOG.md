@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - full support to CREATE data from CSV with tests
 
+### Changed
+- migrations from raw are now put in docker file directly
+
 ## 24.05.2022
 ### Added
 - APOC plugin to docker compose
