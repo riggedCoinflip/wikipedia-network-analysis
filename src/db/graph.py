@@ -19,9 +19,33 @@ class Graph:
         with self.driver.session() as session:
             return session.write_transaction(self._run_csv_page, filename)
 
+    def csv_all_pages(self, neo4j_dir=os.getenv('NEO4J_DIR')):
+            page = "page"
+            dirname = f"{neo4j_dir}/import/{page}"
+            for filename in os.listdir(dirname):
+                if not filename.endswith(".csv"):
+                    continue
+                f = os.path.join(dirname, filename)
+                if os.path.isfile(f):
+                    self.csv_page(f"{page}/{filename}")
+
     def create_pagelink(self, pagelink):
         with self.driver.session() as session:
             return session.write_transaction(self._run_create_pagelink, pagelink)
+
+    def csv_pagelink(self, filename):
+        with self.driver.session() as session:
+            return session.write_transaction(self._run_csv_pagelink, filename)
+
+    def csv_all_pagelinks(self, neo4j_dir=os.getenv('NEO4J_DIR')):
+            pagelinks = "pagelinks"
+            dirname = f"{neo4j_dir}/import/{pagelinks}"
+            for filename in os.listdir(dirname):
+                if not filename.endswith(".csv"):
+                    continue
+                f = os.path.join(dirname, filename)
+                if os.path.isfile(f):
+                    self.csv_pagelink(f"{pagelinks}/{filename}")
 
     @staticmethod
     def _run_create_page(self, page):
@@ -87,6 +111,17 @@ class Graph:
             return result.single()[0]
         except TypeError:
             return "No result"
+
+    @staticmethod
+    def _run_csv_pagelink(self, filename):
+        self.run("LOAD CSV FROM $filename AS line "
+                 "MATCH (a:Page) "
+                 "WHERE a.page_id = toInteger(line[0]) "
+                 "MATCH (b:Page) "
+                 "WHERE b.title = line[2] "
+                 "CREATE (a)-[r:Pagelink]->(b)",
+                 filename=f"file:///{filename}"
+                 )
 
 
 if __name__ == "__main__":
