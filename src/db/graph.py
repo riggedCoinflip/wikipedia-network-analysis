@@ -38,7 +38,7 @@ class Graph:
             return session.write_transaction(self._run_csv_pagelink, filename)
 
     def csv_all_pagelinks(self, neo4j_dir=os.getenv('NEO4J_DIR')):
-            pagelinks = "pagelinks"
+            pagelinks = "PAGELINKS"
             dirname = f"{neo4j_dir}/import/{pagelinks}"
             for filename in os.listdir(dirname):
                 if not filename.endswith(".csv"):
@@ -102,7 +102,7 @@ class Graph:
                           "(b:Page) "
                           "WHERE a.page_id = $from_ "
                           "AND b.title = $title "
-                          "CREATE (a)-[r:Pagelink]->(b)"
+                          "CREATE (a)-[r:PAGELINK]->(b)"
                           "RETURN r",
                           from_=pagelink["from"],
                           title=pagelink["title"],
@@ -119,7 +119,7 @@ class Graph:
                  "WHERE a.page_id = toInteger(line[0]) "
                  "MATCH (b:Page) "
                  "WHERE b.title = line[2] "
-                 "CREATE (a)-[r:Pagelink]->(b)",
+                 "CREATE (a)-[r:PAGELINK]->(b)",
                  filename=f"file:///{filename}"
                  )
 

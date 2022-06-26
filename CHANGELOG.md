@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 26.06.2022
+### Added
+- support for gds in docker for neo4j
+- cypher scripts to generate graphs
+
 ## 26.05.2022
 ### Added
 - full support to CREATE data from CSV with tests

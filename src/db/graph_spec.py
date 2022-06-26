@@ -76,7 +76,7 @@ class TestGraph(unittest.TestCase):
 
         #TODO assert equal
 
-    def test_csv_all_pages(self):
+    def test_csv_all_pages_and_pagelinks(self):
         self.graph.csv_all_pages(neo4j_dir=os.getenv('NEO4J_TEST_DIR'))
         self.graph.csv_all_pagelinks(neo4j_dir=os.getenv('NEO4J_TEST_DIR'))
 
