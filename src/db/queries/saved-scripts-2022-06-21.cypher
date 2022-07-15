@@ -1,3 +1,8 @@
+CALL apoc.load.directory()
+
+MATCH (n)
+RETURN count(n) as count
+
 CREATE INDEX ON :Page(page_id)
 
 CREATE INDEX ON :Page(title)
@@ -25,8 +30,10 @@ CREATE (:Page {
 LOAD CSV FROM 'file:///test_single/pagelink_migrations_stub.csv' AS line 
 MATCH (a:Page)
 WHERE a.page_id = toInteger(line[0])
+AND a.namespace = toInteger(line[3])
 MATCH(b:Page)
 WHERE b.title = line[2]
+AND b.namespace = toInteger(line[1])
 CREATE (a)-[r:Pagelink]->(b)
 
 //check if exists

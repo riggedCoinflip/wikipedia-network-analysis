@@ -1,7 +1,8 @@
 import os
 
-from neo4j import GraphDatabase
 from dotenv import load_dotenv
+from neo4j import GraphDatabase
+
 from timestamp_to_datetime import timestamp_to_datetime
 
 load_dotenv()
@@ -20,14 +21,14 @@ class Graph:
             return session.write_transaction(self._run_csv_page, filename)
 
     def csv_all_pages(self, neo4j_dir=os.getenv('NEO4J_DIR')):
-            page = "page"
-            dirname = f"{neo4j_dir}/import/{page}"
-            for filename in os.listdir(dirname):
-                if not filename.endswith(".csv"):
-                    continue
-                f = os.path.join(dirname, filename)
-                if os.path.isfile(f):
-                    self.csv_page(f"{page}/{filename}")
+        page = "page"
+        dirname = f"{neo4j_dir}/import/{page}"
+        for filename in os.listdir(dirname):
+            if not filename.endswith(".csv"):
+                continue
+            f = os.path.join(dirname, filename)
+            if os.path.isfile(f):
+                self.csv_page(f"{page}/{filename}")
 
     def create_pagelink(self, pagelink):
         with self.driver.session() as session:
@@ -38,14 +39,14 @@ class Graph:
             return session.write_transaction(self._run_csv_pagelink, filename)
 
     def csv_all_pagelinks(self, neo4j_dir=os.getenv('NEO4J_DIR')):
-            pagelinks = "PAGELINKS"
-            dirname = f"{neo4j_dir}/import/{pagelinks}"
-            for filename in os.listdir(dirname):
-                if not filename.endswith(".csv"):
-                    continue
-                f = os.path.join(dirname, filename)
-                if os.path.isfile(f):
-                    self.csv_pagelink(f"{pagelinks}/{filename}")
+        pagelinks = "PAGELINKS"
+        dirname = f"{neo4j_dir}/import/{pagelinks}"
+        for filename in os.listdir(dirname):
+            if not filename.endswith(".csv"):
+                continue
+            f = os.path.join(dirname, filename)
+            if os.path.isfile(f):
+                self.csv_pagelink(f"{pagelinks}/{filename}")
 
     @staticmethod
     def _run_create_page(self, page):
@@ -117,88 +118,40 @@ class Graph:
         self.run("LOAD CSV FROM $filename AS line "
                  "MATCH (a:Page) "
                  "WHERE a.page_id = toInteger(line[0]) "
+                 "AND a.namespace = toInteger(line[3]) "
                  "MATCH (b:Page) "
                  "WHERE b.title = line[2] "
+                 "AND b.namespace = toInteger(line[1]) "
                  "CREATE (a)-[r:PAGELINK]->(b)",
                  filename=f"file:///{filename}"
                  )
 
+    def get_csvs(self, _dir):
+        with self.driver.session() as session:
+            result = session.run("CALL apoc.load.directory('*.csv', $_dir)", _dir=_dir)
+            files = [x[0] for x in result.values()]
+
+            return files
+
+    def import_csvs(self, _dir, start, end):
+        files = self.get_csvs(_dir)
+        if start <= 0:
+            start = 1
+        with self.driver.session() as session:
+            for filename in files[start - 1:end]:
+                if _dir == "page":
+                    session.write_transaction(self._run_csv_page, filename)
+                elif _dir == "pagelinks":
+                    session.write_transaction(self._run_csv_pagelink, filename)
+
 
 if __name__ == "__main__":
-    driver = GraphDatabase.driver(uri=f"bolt://localhost:{os.getenv('NEO4J_CYPHER_PORT')}",
+    driver = GraphDatabase.driver(uri=f"bolt://{os.getenv('URL')}:{os.getenv('NEO4J_CYPHER_PORT')}",
                                   auth=(os.getenv("NEO4J_USR"), os.getenv("NEO4J_PW")))
 
-    with driver.session() as session:
-        result = session.run("MATCH (n)"
-                             "DETACH DELETE n"
-                             )
-        print("deleted db")
-
     page_creator = Graph(driver)
-    print(page_creator.create_page({
-        "id": 1,
-        "namespace": 0,
-        "title": "one",
-        "is_redirect": 0,
-        "is_new": 1,
-        "touched": "20220101000000",
-        "latest": 0,
-        "len": 12345,
-        "content_model": "wikitext"
-    }))
 
-    print(page_creator.create_page({
-        "id": 2,
-        "namespace": 0,
-        "title": "two",
-        "is_redirect": 0,
-        "is_new": 0,
-        "touched": "20220102000000",
-        "latest": 1,
-        "len": 54321,
-        "content_model": "wikitext"
-    }))
-
-    page_creator.create_page({
-        "id": 3,
-        "namespace": 0,
-        "title": "three",
-        "is_redirect": 0,
-        "is_new": 0,
-        "touched": "20220103000000",
-        "latest": 1,
-        "len": 1111,
-        "content_model": "wikitext"
-    })
-
-    page_creator.create_pagelink({
-        "from": 1,
-        "title": "two"
-    })
-
-    page_creator.create_pagelink({
-        "from": 2,
-        "title": "one"
-    })
-
-    page_creator.create_pagelink({
-        "from": 3,
-        "title": "one"
-    })
-
-    page_creator.create_pagelink({
-        "from": 1,
-        "title": "one"
-    })
-
-    page_creator.create_pagelink({
-        "from": 99999,
-        "title": "one"
-    })
-
-    page_creator.create_pagelink({
-        "from": 1,
-        "title": "does_not_exist"
-    })
+    # page_creator.import_csvs("page", 1, 100000)
+    # page_creator.import_csvs("pagelinks", 1, 100000)
 
     driver.close()

@@ -14,7 +14,7 @@ class TestGraph(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls._driver = GraphDatabase.driver(uri=f"bolt://localhost:{os.getenv('NEO4J_TEST_CYPHER_PORT')}")
+        cls._driver = GraphDatabase.driver(uri=f"bolt://{os.getenv('URL')}:{os.getenv('NEO4J_TEST_CYPHER_PORT')}")
 
     def setUp(self):
         with self._driver.session() as session:
@@ -81,6 +81,18 @@ class TestGraph(unittest.TestCase):
         self.graph.csv_all_pagelinks(neo4j_dir=os.getenv('NEO4J_TEST_DIR'))
 
         #TODO assert equal
+
+    def test_get_csvs(self):
+        pages = (self.graph.get_csvs("page"))
+        self.assertEqual(pages, ['page/0000001-data.csv', 'page/0000002-data.csv'])
+
+        pagelinks = (self.graph.get_csvs("pagelinks"))
+        self.assertEqual(pagelinks, ['pagelinks/0000001-data.csv', 'pagelinks/0000002-data.csv'])
+
+    def test_import_csv(self):
+        self.graph.import_csvs("page", 1, 10)
+        self.graph.import_csvs("pagelinks", 1, 20)
+
 
 
 if __name__ == '__main__':
