@@ -16,9 +16,17 @@ class Graph:
         with self.driver.session() as session:
             return session.write_transaction(self._run_create_page, page)
 
+    def create_pagelink(self, pagelink):
+        with self.driver.session() as session:
+            return session.write_transaction(self._run_create_pagelink, pagelink)
+
     def csv_page(self, filename):
         with self.driver.session() as session:
             return session.write_transaction(self._run_csv_page, filename)
+
+    def csv_pagelink(self, filename):
+        with self.driver.session() as session:
+            return session.write_transaction(self._run_csv_pagelink, filename)
 
     def csv_all_pages(self, neo4j_dir=os.getenv('NEO4J_DIR')):
         page = "page"
@@ -29,14 +37,6 @@ class Graph:
             f = os.path.join(dirname, filename)
             if os.path.isfile(f):
                 self.csv_page(f"{page}/{filename}")
-
-    def create_pagelink(self, pagelink):
-        with self.driver.session() as session:
-            return session.write_transaction(self._run_create_pagelink, pagelink)
-
-    def csv_pagelink(self, filename):
-        with self.driver.session() as session:
-            return session.write_transaction(self._run_csv_pagelink, filename)
 
     def csv_all_pagelinks(self, neo4j_dir=os.getenv('NEO4J_DIR')):
         pagelinks = "PAGELINKS"
@@ -80,23 +80,6 @@ class Graph:
             return "No result"
 
     @staticmethod
-    def _run_csv_page(self, filename):
-        self.run("LOAD CSV FROM $filename AS line "
-                 "CREATE (:Page {"
-                 "    page_id: toInteger(line[0]),"
-                 "    namespace: toInteger(line[1]),"
-                 "    title: line[2],"
-                 "    is_redirect: toBoolean(toInteger(line[4])),"
-                 "    is_new: toBoolean(toInteger(line[5])),"
-                 "    touched: datetime({epochmillis: apoc.date.parse(line[7], 'ms', 'yyyyMMddHHmmss')}),"
-                 "    latest: toInteger(line[9]),"
-                 "    len: toInteger(line[10]),"
-                 "    content_model: line[11]"
-                 "})",
-                 filename=f"file:///{filename}"
-                 )
-
-    @staticmethod
     def _run_create_pagelink(self, pagelink):
         result = self.run("MATCH "
                           "(a:Page), "
@@ -112,6 +95,23 @@ class Graph:
             return result.single()[0]
         except TypeError:
             return "No result"
+
+    @staticmethod
+    def _run_csv_page(self, filename):
+        self.run("LOAD CSV FROM $filename AS line "
+                 "CREATE (:Page {"
+                 "    page_id: toInteger(line[0]),"
+                 "    namespace: toInteger(line[1]),"
+                 "    title: line[2],"
+                 "    is_redirect: toBoolean(toInteger(line[4])),"
+                 "    is_new: toBoolean(toInteger(line[5])),"
+                 "    touched: datetime({epochmillis: apoc.date.parse(line[7], 'ms', 'yyyyMMddHHmmss')}),"
+                 "    latest: toInteger(line[9]),"
+                 "    len: toInteger(line[10]),"
+                 "    content_model: line[11]"
+                 "})",
+                 filename=f"file:///{filename}"
+                 )
 
     @staticmethod
     def _run_csv_pagelink(self, filename):
@@ -143,6 +143,7 @@ class Graph:
                     session.write_transaction(self._run_csv_page, filename)
                 elif _dir == "pagelinks":
                     session.write_transaction(self._run_csv_pagelink, filename)
+
 
 
 if __name__ == "__main__":
