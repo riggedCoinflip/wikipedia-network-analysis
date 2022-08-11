@@ -1,0 +1,69 @@
+//01 calc estimate
+CALL gds.graph.project.estimate('*', '*', {
+  nodeCount: 16296665,
+  relationshipCount: 583768961,
+  nodeProperties: 'foo',
+  relationshipProperties: 'bar'
+})
+YIELD requiredMemory, treeView, mapView, bytesMin, bytesMax, nodeCount, relationshipCount
+
+//02 create graph
+CALL gds.graph.project('graph', 'Article', 'LINK')
+YIELD
+  graphName,
+  nodeProjection,
+  nodeCount,
+  relationshipProjection,
+  relationshipCount,
+  projectMillis
+
+//03 dijkstra shortest path estimate
+CALL gds.shortestPath.dijkstra.stream.estimate('graph', {
+    sourceNode: 1,
+    targetNode: 2
+})
+YIELD nodeCount, relationshipCount, bytesMin, bytesMax, requiredMemory
+RETURN nodeCount, relationshipCount, bytesMin, bytesMax, requiredMemory
+
+//04 dijkstra shortest path stream Germany->Lithography
+CALL gds.shortestPath.dijkstra.stream('graph', {
+    sourceNode: 285396,
+    targetNode: 290341
+})
+YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs, path
+RETURN
+    index,
+    gds.util.asNode(sourceNode).title AS sourceNodeName,
+    gds.util.asNode(targetNode).title AS targetNodeName,
+    totalCost,
+    [nodeId IN nodeIds | gds.util.asNode(nodeId).title] AS nodeNames,
+    costs,
+    nodes(path) as path
+ORDER BY index
+
+//05 dijkstra all shortest paths estimate
+CALL gds.allShortestPaths.dijkstra.stream.estimate('graph', {
+    sourceNode: 1
+})
+YIELD nodeCount, relationshipCount, bytesMin, bytesMax, requiredMemory
+RETURN nodeCount, relationshipCount, bytesMin, bytesMax, requiredMemory
+
+//06 dijkstra all shortest paths stream
+CALL gds.allShortestPaths.dijkstra.stream('graph', {
+    sourceNode: 285396
+})
+YIELD totalCost
+RETURN totalCost, COUNT(totalCost) as cnt
+ORDER BY totalCost
+
+//07 dijkstra all shortest paths stream LONGEST PATHS
+CALL gds.allShortestPaths.dijkstra.stream('graph', {
+    sourceNode: 285396
+})
+YIELD index, sourceNode, targetNode, totalCost, nodeIds, path
+WHERE totalCost >= 25
+RETURN
+    totalCost,
+    [nodeId IN nodeIds | gds.util.asNode(nodeId).title] AS nodeNames,
+    nodes(path) as path
+ORDER BY totalCost
