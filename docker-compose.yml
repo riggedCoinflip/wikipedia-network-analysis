@@ -1,0 +1,41 @@
+version: '3.3'
+services:
+    neo4j:
+        container_name: db
+        ports:
+            - '${NEO4J_HTTPS_PORT}:7474'
+            - '${NEO4J_CYPHER_PORT}:7687'
+        volumes:
+            - '${NEO4J_DIR}/data:/data'
+            - '${NEO4J_DIR}/logs:/logs'
+            - '${NEO4J_DIR}/import:/import'
+            - '${NEO4J_DIR}/plugins:/plugins'
+        image: neo4j
+        environment:
+            - NEO4J_AUTH=${NEO4J_USR}/${NEO4J_PW}
+            - NEO4J_apoc_export_file_enabled=true
+            - NEO4J_apoc_import_file_enabled=true
+            - NEO4J_apoc_import_file_use__neo4j__config=true
+            - NEO4J_dbms_security_procedures_whitelist=gds.*, apoc.*
+            - NEO4J_dbms_security_procedures_unrestricted=gds.*, apoc.*
+            - NEO4JLABS_PLUGINS=["apoc", "graph-data-science"]
+    neo4j_test:
+        container_name: db_test
+        ports:
+            - '${NEO4J_TEST_HTTPS_PORT}:7474'
+            - '${NEO4J_TEST_CYPHER_PORT}:7687'
+        volumes:
+            - '${NEO4J_TEST_DIR}/data:/data'
+            - '${NEO4J_TEST_DIR}/logs:/logs'
+            - '${NEO4J_TEST_DIR}/import:/import'
+            - '${NEO4J_TEST_DIR}/plugins:/plugins'
+        image: neo4j
+        environment:
+            - NEO4J_AUTH=none
+            - NEO4J_apoc_export_file_enabled=true
+            - NEO4J_apoc_import_file_enabled=true
+            - NEO4J_apoc_import_file_use__neo4j__config=true
+            - NEO4J_dbms_security_procedures_whitelist=gds.*, apoc.*
+            - NEO4J_dbms_security_procedures_unrestricted=gds.*, apoc.*
+            - NEO4JLABS_PLUGINS=["apoc", "graph-data-science"]
+
